@@ -1,3 +1,4 @@
+const { log } = require("console");
 const fs = require("fs");
 class ProductManager {
   constructor(path) {
@@ -23,7 +24,7 @@ class ProductManager {
     })
   }
   getProducts() {
-    return JSON.parse(fs.readFileSync(this.path,'utf-8'));
+    return JSON.parse(fs.readFileSync(this.path, 'utf-8'));
   }
   getProductById(id) {
     let archivoDeProductos = this.getProducts()
@@ -32,41 +33,40 @@ class ProductManager {
       throw new Error('Not found')
     }
     else {
-
       return archivoDeProductos.find(product => product.id === id)
     }
   }
-  updateProduct(id, actualizacion, valorNuevo) {
-    try {
+  updateProduct(id, actualizacion, valor) {
       const data = fs.readFileSync(this.path, 'utf8');
       const products = JSON.parse(data);
       const productToUpdate = products.find((product) => product.id === id);
       if (productToUpdate) {
-     return productToUpdate[actualizacion] = valorNuevo;
+        productToUpdate[actualizacion] = valor;
+       fs.writeFileSync(this.path, JSON.stringify(products));
+        console.log('Producto actualizado');
       } else {
         console.error('Producto no encontrado');
       }
-    } catch (err) {
-      console.error('Error al leer o escribir el archivo de productos:', err);
-    }
+
   }
-  deleteProduct(id){ 
-        const data = fs.readFileSync(this.path, 'utf8');
-        const products = JSON.parse(data);
-        if (this.getProductById(id)){
-          let newProducts = products.filter((products) => products.id !== id);
-         return fs.writeFileSync(this.path, JSON.stringify(newProducts));
-        } else {
-          console.error('Producto no encontrado');
-        } 
+  deleteProduct(id) {
+    const data = fs.readFileSync(this.path, 'utf8');
+    const products = JSON.parse(data);
+    if (this.getProductById(id)) {
+      let newProducts = products.filter((products) => products.id !== id);
+      fs.writeFileSync(this.path, JSON.stringify(newProducts));
+      return newProducts
+    } else {
+      console.error('Producto no encontrado');
+    }
   }
 }
 const invocacionDePM = new ProductManager('./Products.json');
 let producto1 = invocacionDePM.addProduct('Cuphead', 'Cuphead es un juego de acción clásico estilo "dispara y corre".Inspirado en los dibujos animados de los años 30.', 1400, '[thumbnail]', 'iFgru67', 1)
 let producto2 = invocacionDePM.addProduct('Call of Duty: Black Ops III', 'Call of Duty es un juego de disparos en primera persona', 3400, '[thumbnail]', 'iJhnru81', 1)
-console.log(invocacionDePM.updateProduct(2,('Call of Duty: Black Ops III', 'Call of Duty es un juego de disparos en primera persona', 5400, '[thumbnail]', 'iJhnru81', 1)));
-console.log(invocacionDePM.getProducts());
-console.log(invocacionDePM.deleteProduct(1));
+console.log(invocacionDePM.updateProduct(1, 'price', 2200))
+console.log(invocacionDePM.getProductById(1));
+console.log(invocacionDePM.deleteProduct(2));
 console.log(invocacionDePM.getProducts());
 
 
